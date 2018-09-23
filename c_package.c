@@ -8,7 +8,6 @@
 #include<gtk/gtk.h>
 
 //Declaration
-void input();
 void evaluation(char *str);
 void coefficient_input();
 int number_of_digits(int a);
@@ -166,6 +165,7 @@ void side_separation(char*s)
     s_right[i]=' ';//There should me a space bar before the end for certain uses
     s_right[i+1]=0;
 }
+
 //Function for calculating the number of digits
 int number_of_digits(int a)
 {
@@ -177,6 +177,7 @@ int number_of_digits(int a)
     }
     return count;
 }
+
 //Function for converting the user defined input as arrays for calculations
 void input_conversion_left(char *s)
 {
@@ -201,6 +202,7 @@ void input_conversion_left(char *s)
             }
         }
 }
+
 //This right side is subtracted with left side
 void input_conversion_right(char *s)
 {
@@ -225,23 +227,7 @@ void input_conversion_right(char *s)
             }
         }
 }
-//The input is now ax^n+bx^n-1.........+c=0
-void input()
-{
-    char str[100]; /*Take string as input*/
-    char *s;
-    g_print("Enter the input\n");
-    if(temp==0)
-    scanf("%[^\n]s",str);
-    else
-    scanf("%*c%[^\n]s",str);
-    int coefficient=0;
-    s=rem_space(str);
-    side_separation(s);
-    input_conversion_left(s_left);
-    input_conversion_right(s_right);
-    temp++;
-}
+
 //Function for identifing The degree and the powers present
 void degree_function()
 {
@@ -258,6 +244,7 @@ void degree_function()
     }
  }
 
+
 /*
     Here in this function, we parse a a given string of equation to the format 
     we need it to be 
@@ -272,8 +259,6 @@ void parse_input(char *equation)
     input_conversion_right(s_right);
 
 }
-
-
 
 //function for finding the coefficients of the inputs
 void coefficient_input()
@@ -300,6 +285,8 @@ void coefficient_input()
     coefficient_input_arr[degree-1]=con;
     coefficient_input_arr[degree-1]/=k;
 }
+
+
 //Function for evaluation of factors
 // "poly" evaluates at x a polynomial of the form:
 // f(x) = cpow(x, n) + a1*cpow(x, n - 1) + a2*cpow(x, n - 2) + . . . + a(n - 2)*x*x + a(n - 1)*x + a(n)
@@ -311,6 +298,7 @@ double complex poly(int degree, double complex x)
         y += coefficient_input_arr[i]*cpow(x, (degree - i - 1) );
     return y;
 }
+
 
 // polyroot uses the Durand-Kerner method to find all roots (real and complex) of a polynomial of the form:
 // f(x) = cpow(x, n) + a1*cpow(x, n - 1) + a2*cpow(x, n - 2) + . . . + a(n - 2)*x*x + a(n - 1)*x + a(n)
@@ -339,6 +327,8 @@ double complex * polyroot(int degree)
     }
     return R;
 }
+
+
 //function for evaluation
 void evaluation(char *str)
 {
@@ -352,6 +342,7 @@ void evaluation(char *str)
     degree_function();
     coefficient_input();
 }
+
 void factorize(char *str)
 {
     evaluation(str);
@@ -391,7 +382,7 @@ void factorize(char *str)
     }
 }
 
-
+// Set up the UI for a screen
 void show_factorize_screen(GtkWidget *widget, GtkApplication *app)
 {
     // The window that contains all the widgets.
@@ -493,7 +484,7 @@ void show_solve2equations_screen(GtkWidget *widget, GtkApplication *app)
 
     solve_button = gtk_button_new_with_label ("Solve");
     
-    g_signal_connect (solve_button, "clicked", G_CALLBACK (solve_2_equations), equation_textbox1);
+    g_signal_connect (solve_button, "clicked", G_CALLBACK (solve_2_equations), NULL);
     gtk_widget_set_size_request(GTK_WIDGET(solve_button), 10, 30);
 
     enter_eqn_label = gtk_label_new(" Enter two equations in the textboxes : ");
@@ -539,7 +530,7 @@ void show_solve3equations_screen(GtkWidget *widget, GtkApplication *app)
     // The window that contains all the widgets.
     GtkWidget *window;
 
-    // A button with the label "Solve" that calculates fators when clicked
+    // A button with the label "Solve" that calculates and solves the equations when clicked
     GtkWidget *solve_button;
 
     // The grid in which all the widgets are placed
@@ -573,7 +564,7 @@ void show_solve3equations_screen(GtkWidget *widget, GtkApplication *app)
 
     solve_button = gtk_button_new_with_label ("Solve");
     
-    g_signal_connect (solve_button, "clicked", G_CALLBACK (solve_2_equations), NULL);
+    g_signal_connect (solve_button, "clicked", G_CALLBACK (solve_3_equations), NULL);
     gtk_widget_set_size_request(GTK_WIDGET(solve_button), 10, 30);
 
     enter_eqn_label = gtk_label_new(" Enter three equations in the textboxes : ");
@@ -674,8 +665,8 @@ int main(int argc, char **argv)
 {
     GtkApplication *app;
     int status;
-    // Initializing this here as it can be initialized only once.
 
+    // Initializing this here as it can be initialized only once.
     app = gtk_application_new ("org.gtk.example", G_APPLICATION_FLAGS_NONE);
     g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
     status = g_application_run (G_APPLICATION (app), argc, argv);
@@ -690,7 +681,7 @@ void solve_2_equations()
 {
     float a1,b1,a2,b2;
     int var1=0,var2=0;
-    //input();
+
     char equation1[100];
     char equation2[100];
 
@@ -721,7 +712,6 @@ void solve_2_equations()
         {
             if(coefficient_arr1[i][j]!=0)
             {
-                //g_print("%f %c ^ %d ",coefficient_arr1[i][j],i+'a',j);
                 sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr1[i][j],i+'a',j);
                 g_print(string_to_print);
                 print_to_label(solution_output_label,string_to_print,0);
@@ -754,10 +744,6 @@ void solve_2_equations()
                 sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr2[i][j],i+'a',j);
                 g_print(string_to_print);
                 print_to_label(solution_output_label,string_to_print,0);
-                // g_print("\nEquation 1: %+.2f%c^%d ",coefficient_arr2[i][j],i+'a',j);
-                
-                // sprintf(string_to_print, "Equation 2:  %+.2f%c^%d \0",coefficient_arr2[i][j],i+'a',j);
-                // print_to_label(solution_output_label,string_to_print,0);
             }
         }
     }
@@ -839,7 +825,8 @@ double determinantOfMatrix(double mat[3][3])
 // This function finds the solution of system of 
 // linear equations using cramer's rule 
 void findSolution(double coeff[3][4]) 
-{ 
+{
+    char string_to_print[150];
     // Matrix d using coeff as given in cramer's rule 
     double d[3][3] = { 
         { coeff[0][0], coeff[0][1], coeff[0][2] }, 
@@ -876,24 +863,47 @@ void findSolution(double coeff[3][4])
         // Coeff have a unique solution. Apply Cramer's Rule 
         double x = D1 / D; 
         double y = D2 / D; 
-        double z = D3 / D; // calculating z using cramer's rule 
+        double z = D3 / D; // calculating z using cramer's rule
+        
+        sprintf(string_to_print, "\nOn solving, we get \nx = %.2lf\t y = %.2lf\t z = %.2lf\n ",x, y, z);
+        print_to_label(solution_output_label, string_to_print, 0);
         g_print("Value of x is : %lf\n", x); 
         g_print("Value of y is : %lf\n", y); 
         g_print("Value of z is : %lf\n", z); 
-    } 
+    }
     // Case 2 
     else { 
-        if (D1 == 0 && D2 == 0 && D3 == 0) 
+        if (D1 == 0 && D2 == 0 && D3 == 0)
+        {
             g_print("Infinite solutions\n"); 
-        else if (D1 != 0 || D2 != 0 || D3 != 0) 
-            g_print("No solutions\n"); 
+            print_to_label(solution_output_label, "\n\nThis system has infinitely many solutions", 0);
+        }
+        else if (D1 != 0 || D2 != 0 || D3 != 0)
+        {
+            g_print("No solutions\n");
+            print_to_label(solution_output_label, "\n\nThis system has no solution", 0);
+        }
     } 
 } 
 void solve_3_equations()
 { 
     float a1,b1,a2,b2,a3,b3,c1,c2,c3;
     int var1=0,var2=0,var3=0;
-    input();
+
+    char equation1[100];
+    char equation2[100];
+    char equation3[100];
+    // A temporary place for holding the string to be shown on the GTK window. 
+    char string_to_print[150];
+
+    strcpy(equation1, gtk_entry_get_text(GTK_ENTRY(equation_textbox1)));
+    strcpy(equation2, gtk_entry_get_text(GTK_ENTRY(equation_textbox2)));
+    strcpy(equation3, gtk_entry_get_text(GTK_ENTRY(equation_textbox3)));
+
+    // Reset all the variables to their initial value;
+    reset_all();
+    parse_input(equation1);
+
     con1=con;
     con=0;
     for(int i=0;i<26;i++)
@@ -901,17 +911,32 @@ void solve_3_equations()
         coefficient_arr1[i][1]=coefficient_arr[i][1];
         coefficient_arr[i][1]=0;
     }
-    //test
+    
+    //Output the given equation 1, Print the co-efficients seperately and then the constant seperately.
+    g_print("\nGiven equation 1:  ");
+    // Here we clear the exixting text in label
+    print_to_label(solution_output_label,"\nGiven equation 1:  ",1);
+    
     for(int i=0;i<26;i++)
     {
         for(int j=0;j<10;j++)
         {
             if(coefficient_arr1[i][j]!=0)
-                g_print("\n%f %c ^ %d ",coefficient_arr1[i][j],i+'a',j);
+            {
+                sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr1[i][j],i+'a',j);
+                g_print(string_to_print);
+                print_to_label(solution_output_label,string_to_print,0);
+
+            }
         }
     }
-    g_print("%f\n",con1);
-    input(); 
+
+    // Print the constant and append a zero to the end.
+    sprintf(string_to_print, "%+.2f = 0\n", con1);
+    g_print(string_to_print);
+    print_to_label(solution_output_label,string_to_print,0);
+
+    parse_input(equation2);
     con2=con;
     con=0;
     for(int i=0;i<26;i++)
@@ -919,17 +944,33 @@ void solve_3_equations()
         coefficient_arr2[i][1]=coefficient_arr[i][1];
         coefficient_arr[i][1]=0;
     }
-    //test
+
+    //Output the given equation 1, Print the co-efficients seperately and then the constant seperately.
+    g_print("\nGiven equation 2:  ");
+    print_to_label(solution_output_label,"\nGiven equation 2:  ",0);
+
     for(int i=0;i<26;i++)
     {
         for(int j=0;j<10;j++)
         {
             if(coefficient_arr2[i][j]!=0)
-                g_print("\n%f %c ^ %d ",coefficient_arr2[i][j],i+'a',j);
+            {
+                // g_print("\n%f %c ^ %d ",coefficient_arr2[i][j],i+'a',j);
+                sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr2[i][j],i+'a',j);
+                g_print(string_to_print);
+                print_to_label(solution_output_label,string_to_print,0);
+
+            }
         }
     }
-    g_print("%f\n",con2);
-    input(); 
+
+    // Print the constant and append a zero to the end.
+    sprintf(string_to_print, "%+.2f = 0\n", con2);
+    g_print(string_to_print);
+    print_to_label(solution_output_label,string_to_print,0);
+
+
+    parse_input(equation3);
     con3=con;
     con=0;
     for(int i=0;i<26;i++)
@@ -937,16 +978,29 @@ void solve_3_equations()
         coefficient_arr3[i][1]=coefficient_arr[i][1];
         coefficient_arr[i][1]=0;
     }
-    //test
+
+    //Output the given equation 1, Print the co-efficients seperately and then the constant seperately.
+    g_print("\nGiven equation 3:  ");
+    print_to_label(solution_output_label,"\nGiven equation 3:  ",0);
+
     for(int i=0;i<26;i++)
     {
         for(int j=0;j<10;j++)
         {
             if(coefficient_arr3[i][j]!=0)
-                g_print("\n%f %c ^ %d ",coefficient_arr3[i][j],i+'a',j);
+            {
+                sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr3[i][j],i+'a',j);
+                g_print(string_to_print);
+                print_to_label(solution_output_label,string_to_print,0);
+            }
         }
     }
-    g_print("%f\n",con3);
+
+    // Print the constant and append a zero to the end.
+    sprintf(string_to_print, "%+.2f = 0\n", con3);
+    g_print(string_to_print);
+    print_to_label(solution_output_label,string_to_print,0);
+
     for(int i=0,j=0;i<26;i++)
     {
         if(j==0)
@@ -983,7 +1037,7 @@ void solve_3_equations()
             }
         }
     }
-    g_print("\n%f %f %f",a1,a2,a3);
+    g_print("\nCo-efficients: \n%f %f %f",a1,a2,a3);
     g_print("\n %f %f %f",b1,b2,b3);
     g_print("\n %f %f %f",c1,c2,c3);
     g_print("\n%f %f %f\n",con1,con2,con3);
@@ -991,23 +1045,11 @@ void solve_3_equations()
         { a1,b1,c1,-1*con1}, 
         { a2,b2,c2,-1*con2}, 
         { a3,b3,c3,-1*con3}, 
-    }; 
+    };
 
     findSolution(coeff); 
 } 
 
-
-static void print_hello (GtkWidget *widget, GtkWidget *text)
-{
-    const gchar *value;
-    value = gtk_entry_get_text(GTK_ENTRY(text));
-    g_print ("Hello World\n");
-    g_print(value);
-
-    char s[50];
-    strcpy(s, value);
-    g_print("%s", s);
-}
 
 void compute_factors(GtkWidget *widget, GtkWidget *text)
 {
