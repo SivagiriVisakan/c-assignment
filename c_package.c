@@ -29,6 +29,7 @@ char * complex_to_string(double complex number);
 void compute_factors(GtkWidget *widget, GtkWidget *text);
 void print_to_label(GtkWidget *label, char *string, int clear_before_printing);
 void reset_all();
+void parse_input(char *equation);
 
 
 //Global variable
@@ -41,10 +42,21 @@ float coefficient_arr2[26][100]={0};
 float coefficient_arr3[26][100]={0};
 double con=0,con1=0,con2=0,con3=0;
 
-
-char output_string[500];
-// The label in which the factors are shown
+// The label in which the factors in Factorize screen are shown
 GtkWidget *factors_output_label;
+
+// The label in which the solution are shown(in both 2 equation and 3 equation screens) are shown
+GtkWidget *solution_output_label;
+
+// A GtkEntry which will act as an input for equation
+GtkWidget *equation_textbox1;
+
+// A GtkEntry which will act as an input for equation
+GtkWidget *equation_textbox2;
+
+// A GtkEntry which will act as an input for equation
+GtkWidget *equation_textbox3;
+
 
 //Function for removing all the blank spaces in the input
 char * append(char *a,int number,int digit)
@@ -245,6 +257,24 @@ void degree_function()
         }
     }
  }
+
+/*
+    Here in this function, we parse a a given string of equation to the format 
+    we need it to be 
+*/
+void parse_input(char *equation)
+{
+    char *s;
+    int coefficient=0;
+    s=rem_space(equation);
+    side_separation(s);
+    input_conversion_left(s_left);
+    input_conversion_right(s_right);
+
+}
+
+
+
 //function for finding the coefficients of the inputs
 void coefficient_input()
 {
@@ -358,7 +388,6 @@ void factorize(char *str)
         sprintf(string_to_print, "\n%s", complex_to_string(factors[i]));
         print_to_label(factors_output_label, string_to_print, 0);
 
-        //g_print("\n%lf  %lf\n",creal(factors[i]),cimag(factors[i]));
     }
 }
 
@@ -393,7 +422,7 @@ void show_factorize_screen(GtkWidget *widget, GtkApplication *app)
 
     equation_textbox = gtk_entry_new();
     gtk_widget_set_size_request(GTK_WIDGET(equation_textbox), 500, 20);
-
+    gtk_entry_set_placeholder_text(GTK_ENTRY(equation_textbox), "Enter an equation !");
     factorize_button = gtk_button_new_with_label ("Factorize");
     
     g_signal_connect (factorize_button, "clicked", G_CALLBACK (compute_factors), equation_textbox);
@@ -407,7 +436,7 @@ void show_factorize_screen(GtkWidget *widget, GtkApplication *app)
     
     gtk_widget_set_hexpand (factorize_button, TRUE);
     gtk_widget_set_halign (factorize_button, GTK_ALIGN_CENTER);
-    
+
     gtk_widget_set_hexpand (equation_textbox, TRUE);
     gtk_widget_set_halign (equation_textbox, GTK_ALIGN_CENTER);
 
@@ -429,37 +458,211 @@ void show_factorize_screen(GtkWidget *widget, GtkApplication *app)
     gtk_widget_show_all (window);
 }
 
+void show_solve2equations_screen(GtkWidget *widget, GtkApplication *app)
+{
+    // The window that contains all the widgets.
+    GtkWidget *window;
+
+    // A button with the label "Solve" that calculates fators when clicked
+    GtkWidget *solve_button;
+
+    // The grid in which all the widgets are placed
+    GtkWidget *grid;
+
+    // A label with the text "Enter two equations in the textboxes"
+    GtkWidget *enter_eqn_label;
+
+    // A label to show the text "Solution".
+    GtkWidget *solution_label;
+
+    // Initialize and configure UI
+    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window), "Solve two linear equations - EQNS");
+
+    // When a window is set to modal it prevents interaction witb other windows.
+    gtk_window_set_modal(GTK_WINDOW (window), TRUE);
+    gtk_window_set_default_size (GTK_WINDOW (window), 1000, 500);
+
+    equation_textbox1 = gtk_entry_new();
+    gtk_widget_set_size_request(GTK_WIDGET(equation_textbox1), 500, 20);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(equation_textbox1), "Enter the first equation !");
+
+    equation_textbox2 = gtk_entry_new();
+    gtk_widget_set_size_request(GTK_WIDGET(equation_textbox2), 500, 20);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(equation_textbox2), "Enter the second equation !");
+
+    solve_button = gtk_button_new_with_label ("Solve");
+    
+    g_signal_connect (solve_button, "clicked", G_CALLBACK (solve_2_equations), equation_textbox1);
+    gtk_widget_set_size_request(GTK_WIDGET(solve_button), 10, 30);
+
+    enter_eqn_label = gtk_label_new(" Enter two equations in the textboxes : ");
+
+    solution_label = gtk_label_new("\n\n  Solution:\n ");
+
+
+    grid = gtk_grid_new();
+    
+    gtk_widget_set_hexpand(solve_button, TRUE);
+    gtk_widget_set_halign(solve_button, GTK_ALIGN_CENTER);
+
+    gtk_widget_set_hexpand(equation_textbox1, TRUE);
+    gtk_widget_set_halign(equation_textbox1, GTK_ALIGN_CENTER);
+
+    gtk_widget_set_hexpand(equation_textbox2, TRUE);
+    gtk_widget_set_halign(equation_textbox2, GTK_ALIGN_CENTER);
+
+
+    gtk_widget_set_hexpand (solution_label, FALSE);
+    gtk_widget_set_halign (solution_label, GTK_ALIGN_START);
+
+
+    gtk_grid_attach(GTK_GRID(grid), enter_eqn_label, 0, 0, 10, 1);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), equation_textbox1, enter_eqn_label, GTK_POS_RIGHT, 5, 1);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), solve_button, equation_textbox1, GTK_POS_RIGHT, 5, 1);
+    gtk_grid_attach_next_to(GTK_GRID(grid), equation_textbox2, equation_textbox1, GTK_POS_BOTTOM, 5, 1);
+
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), solution_label, enter_eqn_label, GTK_POS_BOTTOM, 15, 20);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), solution_output_label, solution_label, GTK_POS_BOTTOM, 15, 20);
+
+    gtk_container_add (GTK_CONTAINER (window), grid);
+    gtk_widget_show_all (window);
+}
+
+
+void show_solve3equations_screen(GtkWidget *widget, GtkApplication *app)
+{
+    // The window that contains all the widgets.
+    GtkWidget *window;
+
+    // A button with the label "Solve" that calculates fators when clicked
+    GtkWidget *solve_button;
+
+    // The grid in which all the widgets are placed
+    GtkWidget *grid;
+
+    // A label with the text "Enter two equations in the textboxes"
+    GtkWidget *enter_eqn_label;
+
+    // A label to show the text "Solution".
+    GtkWidget *solution_label;
+
+    // Initialize and configure UI
+    window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window), "Solve three linear equations - EQNS");
+
+    // When a window is set to modal it prevents interaction witb other windows.
+    gtk_window_set_modal(GTK_WINDOW (window), TRUE);
+    gtk_window_set_default_size (GTK_WINDOW (window), 1000, 500);
+
+    equation_textbox1 = gtk_entry_new();
+    gtk_widget_set_size_request(GTK_WIDGET(equation_textbox1), 500, 20);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(equation_textbox1), "Enter the first equation !");
+
+    equation_textbox2 = gtk_entry_new();
+    gtk_widget_set_size_request(GTK_WIDGET(equation_textbox2), 500, 20);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(equation_textbox2), "Enter the second equation !");
+
+    equation_textbox3 = gtk_entry_new();
+    gtk_widget_set_size_request(GTK_WIDGET(equation_textbox3), 500, 20);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(equation_textbox3), "Enter the third equation !");
+
+    solve_button = gtk_button_new_with_label ("Solve");
+    
+    g_signal_connect (solve_button, "clicked", G_CALLBACK (solve_2_equations), NULL);
+    gtk_widget_set_size_request(GTK_WIDGET(solve_button), 10, 30);
+
+    enter_eqn_label = gtk_label_new(" Enter three equations in the textboxes : ");
+
+    solution_label = gtk_label_new("\n\n\n\n  Solution:\n ");
+
+
+    grid = gtk_grid_new();
+    
+    gtk_widget_set_hexpand(solve_button, TRUE);
+    gtk_widget_set_halign(solve_button, GTK_ALIGN_CENTER);
+
+    gtk_widget_set_hexpand(equation_textbox1, TRUE);
+    gtk_widget_set_halign(equation_textbox1, GTK_ALIGN_CENTER);
+
+    gtk_widget_set_hexpand(equation_textbox2, TRUE);
+    gtk_widget_set_halign(equation_textbox2, GTK_ALIGN_CENTER);
+
+    gtk_widget_set_hexpand(equation_textbox3, TRUE);
+    gtk_widget_set_halign(equation_textbox3, GTK_ALIGN_CENTER);
+
+    gtk_widget_set_hexpand (solution_label, FALSE);
+    gtk_widget_set_halign (solution_label, GTK_ALIGN_START);
+
+
+    gtk_grid_attach(GTK_GRID(grid), enter_eqn_label, 0, 0, 10, 1);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), equation_textbox1, enter_eqn_label, GTK_POS_RIGHT, 5, 1);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), equation_textbox2, equation_textbox1, GTK_POS_BOTTOM, 5, 1);
+    gtk_grid_attach_next_to(GTK_GRID(grid), solve_button, equation_textbox2, GTK_POS_RIGHT, 5, 1);
+    gtk_grid_attach_next_to(GTK_GRID(grid), equation_textbox3, equation_textbox2, GTK_POS_BOTTOM, 5, 1);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), solution_label, enter_eqn_label, GTK_POS_BOTTOM, 15, 20);
+
+    gtk_grid_attach_next_to(GTK_GRID(grid), solution_output_label, solution_label, GTK_POS_BOTTOM, 15, 20);
+
+    gtk_container_add (GTK_CONTAINER (window), grid);
+    gtk_widget_show_all (window);
+}
 
 void activate (GtkApplication *app, gpointer user_data)
 {
     GtkWidget *window;
-    GtkWidget *button;
-    GtkWidget *button_box;
+    GtkWidget *factorize_button;
+    GtkWidget *solve2eqn_button;
+    GtkWidget *solve3eqn_button;
+    GtkWidget *grid;
 
-    GtkWidget *text;
+    GtkWidget *info_label;
 
     // Initialize this global variable here with empty text
     factors_output_label = gtk_label_new(NULL);
+    solution_output_label = gtk_label_new(NULL);
 
     window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW (window), "Window");
     gtk_window_set_default_size (GTK_WINDOW (window), 500, 500);
 
-    button_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 20);
-    gtk_container_add (GTK_CONTAINER (window), button_box);
+    grid = gtk_grid_new();
+    gtk_container_add (GTK_CONTAINER (window), grid);
 
-    text = gtk_entry_new();
+    info_label = gtk_label_new("\n\nEQNS - Manipulating Math Equations\n\nChoose an option to continue\n");
 
-    button = gtk_button_new_with_label ("Hello World");
-    //g_signal_connect (button, "clicked", G_CALLBACK (print_hello), text);
-    g_signal_connect (button, "clicked", G_CALLBACK (show_factorize_screen), app);
-    //g_signal_connect_swapped (button, "clicked", G_CALLBACK (gtk_widget_destroy), window);
-    gtk_widget_set_size_request (GTK_WIDGET(button), 100, 50);
-    gtk_container_add (GTK_CONTAINER (button_box), button);
+    factorize_button = gtk_button_new_with_label ("Factorize an equation(finding roots)");
+    gtk_widget_set_size_request (GTK_WIDGET(factorize_button), 100, 25);
+    g_signal_connect (factorize_button, "clicked", G_CALLBACK (show_factorize_screen), app);
 
+    gtk_widget_set_hexpand(factorize_button, TRUE);
+    gtk_widget_set_halign(factorize_button, GTK_ALIGN_CENTER);
 
-    gtk_entry_set_placeholder_text(GTK_ENTRY(text), "Enter the equation !");
-    gtk_container_add(GTK_CONTAINER(button_box), text);
+    solve2eqn_button = gtk_button_new_with_label("Solve 2 equations");
+    gtk_widget_set_size_request (GTK_WIDGET(solve2eqn_button), 100, 25);
+    g_signal_connect (solve2eqn_button, "clicked", G_CALLBACK (show_solve2equations_screen), app);
+
+    gtk_widget_set_hexpand(solve2eqn_button, TRUE);
+    gtk_widget_set_halign(solve2eqn_button, GTK_ALIGN_CENTER);
+
+    solve3eqn_button = gtk_button_new_with_label("Solve 3 equations");
+    gtk_widget_set_size_request (GTK_WIDGET(solve3eqn_button), 100, 25);
+    g_signal_connect (solve3eqn_button, "clicked", G_CALLBACK (show_solve3equations_screen), app);
+
+    gtk_widget_set_hexpand(solve3eqn_button, TRUE);
+    gtk_widget_set_halign(solve3eqn_button, GTK_ALIGN_CENTER);
+
+    gtk_grid_attach(GTK_GRID(grid), info_label, 0, 0, 10, 1);
+    gtk_grid_attach_next_to(GTK_GRID(grid), factorize_button, info_label, GTK_POS_BOTTOM, 10, 10);
+    gtk_grid_attach_next_to(GTK_GRID(grid), solve2eqn_button, factorize_button, GTK_POS_BOTTOM, 10, 10);
+    gtk_grid_attach_next_to(GTK_GRID(grid), solve3eqn_button, solve2eqn_button, GTK_POS_BOTTOM, 10, 10);
 
     gtk_widget_show_all (window);
 }
@@ -487,7 +690,19 @@ void solve_2_equations()
 {
     float a1,b1,a2,b2;
     int var1=0,var2=0;
-    input();
+    //input();
+    char equation1[100];
+    char equation2[100];
+
+    // A temporary place for holding the string to be shown on the GTK window. 
+    char string_to_print[150];
+
+    strcpy(equation1, gtk_entry_get_text(GTK_ENTRY(equation_textbox1)));
+    strcpy(equation2, gtk_entry_get_text(GTK_ENTRY(equation_textbox2)));
+
+    // Reset all the variables to their initial value;
+    reset_all();
+    parse_input(equation1);
     con1=con;
     con=0;
     for(int i=0;i<26;i++)
@@ -495,32 +710,63 @@ void solve_2_equations()
         coefficient_arr1[i][1]=coefficient_arr[i][1];
         coefficient_arr[i][1]=0;
     }
-    //test
+
+    //Output the given equation 1, Print the co-efficients seperately and then the constant seperately.
+    g_print("\nGiven equation 1:  ");
+    // Here we clear the exixting text in label
+    print_to_label(solution_output_label,"\nGiven equation 1:  ",1);
     for(int i=0;i<26;i++)
     {
         for(int j=0;j<10;j++)
         {
             if(coefficient_arr1[i][j]!=0)
-                g_print("%f %c ^ %d ",coefficient_arr1[i][j],i+'a',j);
+            {
+                //g_print("%f %c ^ %d ",coefficient_arr1[i][j],i+'a',j);
+                sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr1[i][j],i+'a',j);
+                g_print(string_to_print);
+                print_to_label(solution_output_label,string_to_print,0);
+
+            }
         }
     }
-    g_print("%f\n",con1);
-    input(); 
+    // Print the constant and append a zero to the end.
+    sprintf(string_to_print, "%+.2f = 0\n", con1);
+    g_print(string_to_print);
+    print_to_label(solution_output_label,string_to_print,0);
+
+    // Parse the second equation.
+    parse_input(equation2);
     con2=con;
     for(int i=0;i<26;i++)
     {
         coefficient_arr2[i][1]=coefficient_arr[i][1];
     }
-    //test
+
+    //Output the given equation 1, Print the co-efficients seperately and then the constant seperately.
+    g_print("\nGiven equation 2:  ");
+    print_to_label(solution_output_label,"\nGiven equation 2:  ",0);
     for(int i=0;i<26;i++)
     {
         for(int j=0;j<10;j++)
         {
-            if(coefficient_arr[i][j]!=0)
-                g_print("%f %c ^ %d ",coefficient_arr[i][j],i+'a',j);
+            if(coefficient_arr2[i][j]!=0)
+            {
+                sprintf(string_to_print, "%+.2f%c^%d \0",coefficient_arr2[i][j],i+'a',j);
+                g_print(string_to_print);
+                print_to_label(solution_output_label,string_to_print,0);
+                // g_print("\nEquation 1: %+.2f%c^%d ",coefficient_arr2[i][j],i+'a',j);
+                
+                // sprintf(string_to_print, "Equation 2:  %+.2f%c^%d \0",coefficient_arr2[i][j],i+'a',j);
+                // print_to_label(solution_output_label,string_to_print,0);
+            }
         }
     }
-    g_print("%f\n",con);
+
+    // Print the constant and append a zero to the end.
+    sprintf(string_to_print, "%+.2f = 0\n", con2);
+    g_print(string_to_print);
+    print_to_label(solution_output_label,string_to_print,0);
+
     for(int i=0,j=0;i<26;i++)
     {
         if(j==0)
@@ -541,15 +787,18 @@ void solve_2_equations()
             }
         }
     }
-    g_print("\n%f %f",a1,a2);
-    g_print("\n %f %f",b1,b2);
-    g_print("%f %f",con1,con2);
+    // This is just for logging the process to the terminal.
+    g_print("\nCo-efficients of one variable: %f %f",a1,a2);
+    g_print("\nCo-efficients of another variable: %f %f",b1,b2);
+    g_print("Constants: %f %f",con1,con2);
     two_variablesolve(a1,b1,a2,b2,var1,var2);
     
 }
+
 float two_variablesolve(float a1,float b1,float a2,float b2,char var1,char var2)
 {
     float x=0,y=0;
+    char string_to_print[500];
     if((a1*b2 - a2*b1))
     {
         x = (b1*con2 - b2*con1) / (a1*b2 - a2*b1);
@@ -562,14 +811,18 @@ float two_variablesolve(float a1,float b1,float a2,float b2,char var1,char var2)
             if((b1*con2 - b2*con1)==0&&(con1*a2 - con2*a1)==0)
             {
                 g_print("Infinitely many solutions\n");
+                print_to_label(solution_output_label,"This system of equations has infinitely many solutions \n",0);
             }
             else
             {
                 g_print("No Solution\n");
+                print_to_label(solution_output_label,"This system of equations has no solution \n",0);
             }
         }
     }
-    g_print("\n%c=%f\t%c=%f\n",var1+'a',x,var2+'a',y);
+    g_print("\n%c=%.2f\t%c=%.2f\n",var1+'a',x,var2+'a',y);
+    sprintf(string_to_print, "\nOn solving, we get \n%c = %.2f\t %c = %.2f\n", var1+'a', x, var2+'a', y);
+    print_to_label(solution_output_label, string_to_print, 0);
     return 0;
 }
 
@@ -766,7 +1019,7 @@ void compute_factors(GtkWidget *widget, GtkWidget *text)
 
     char s[50];
     strcpy(s, equation);
-    g_print("\n\n%s\n\n", s);
+    g_print("\n\nGiven input: %s\n\n", s);
 
     factorize(s);
     reset_all();
@@ -776,14 +1029,14 @@ void print_to_label(GtkWidget *label, char *string, int clear_before_printing)
 {
     if(clear_before_printing) 
     {
-        gtk_label_set_text(GTK_LABEL(factors_output_label), string);
+        gtk_label_set_text(GTK_LABEL(label), string);
     }
     else
     {
         char existing_output[500];
         g_print(string);
-        strcpy(existing_output, gtk_label_get_text(GTK_LABEL(factors_output_label)));
-        gtk_label_set_text(GTK_LABEL(factors_output_label), strcat(existing_output, string));
+        strcpy(existing_output, gtk_label_get_text(GTK_LABEL(label)));
+        gtk_label_set_text(GTK_LABEL(label), strcat(existing_output, string));
     }
 }
 
